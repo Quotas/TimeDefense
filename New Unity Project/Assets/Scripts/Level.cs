@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+[System.Serializable]
 public class Level : MonoBehaviour
 {
 
@@ -10,7 +12,7 @@ public class Level : MonoBehaviour
     public List<Enemy> activeEnemies;
     public List<Tower> activeTowers;
 
-    public Dictionary<string, Enemy[]> waveID;
+    public Dictionary<int, Enemy[]> waveID = new Dictionary<int, Enemy[]>();
 
     public Enemy[] wave1;
     public Enemy[] wave2;
@@ -21,18 +23,21 @@ public class Level : MonoBehaviour
 
 
     public bool waveFinished;
+    public bool inDelay;
     public float waveDelay = 5f;
-    public int curWave = 0;
+    public int curWave = 1;
 
 
     // Use this for initialization
     void Start()
     {
 
-        waveID.Add("Wave 1", wave1);
-        waveID.Add("Wave 2", wave2);
-        waveID.Add("Wave 3", wave3);
-        waveID.Add("Wave 4", wave4);
+        waveID.Add(1, wave1);
+        waveID.Add(2, wave2);
+        waveID.Add(3, wave3);
+        waveID.Add(4, wave4);
+
+        SpawnWave();
 
 
     }
@@ -41,12 +46,30 @@ public class Level : MonoBehaviour
     void Update()
     {
 
-        activeEnemies.AddRange(FindObjectsOfType<Enemy>());
+        if (waveFinished == false)
+        {
 
-        if (activeEnemies.Count == 0)
+            activeEnemies.AddRange(FindObjectsOfType<Enemy>());
+
+        }
+
+        if (activeEnemies.Count == 0 && inDelay == false)
         {
 
             waveFinished = true;
+            if (curWave != 4)
+            {
+                curWave += 1;
+                Invoke("SpawnWave", waveDelay);
+                inDelay = true;
+            }
+            else
+            {
+                Debug.Log("You won?");
+
+            }
+
+
 
         }
 
@@ -59,4 +82,26 @@ public class Level : MonoBehaviour
 
 
     }
+
+    void SpawnWave()
+    {
+        var xOffset = 0;
+        inDelay = false;
+
+        foreach (Enemy enemy in waveID[curWave])
+        {
+            xOffset += 2;
+            enemy.level = this;
+            enemy.transform.position = GameObject.FindGameObjectWithTag("SpawnPoint").transform.position;
+            enemy.transform.position += new Vector3(xOffset, 0, 0);
+            Instantiate(enemy);
+
+        }
+
+        waveFinished = false;
+
+
+
+    }
+
 }
