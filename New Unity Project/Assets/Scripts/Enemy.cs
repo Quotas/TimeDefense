@@ -8,12 +8,15 @@ public class Enemy : MonoBehaviour
 {
 
     public Level level;
+    public GameManager gameManager;
     public enum EnemyType { BIG, SMALL, FAST };
     public EnemyType type;
 
     public List<Node> nodes;
 
+
     public int health = 100;
+    public int damage = 1;
     public float speed = 10f;
 
 
@@ -29,6 +32,7 @@ public class Enemy : MonoBehaviour
     void Start()
     {
 
+        gameManager = FindObjectOfType<GameManager>();
         nodes = FindObjectsOfType<Node>().OrderBy(node => node.order).ToList<Node>();
 
         //switch (type)
@@ -74,6 +78,12 @@ public class Enemy : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        if (other.tag == "EndBounds")
+        {
+
+            gameManager.DoDamage(damage);
+
+        }
 
         if (other.tag == "Node")
         {
@@ -89,6 +99,11 @@ public class Enemy : MonoBehaviour
 
 
         }
+
+
+
+
+
 
 
     }

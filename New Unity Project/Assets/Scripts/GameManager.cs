@@ -3,24 +3,29 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 
 [System.Serializable]
 public class GameManager : MonoBehaviour
 
 {
-    [HideInInspector]
+
     public static GameManager instance = null;
 
     public Level[] levels;
 
+    public enum GameState { GAMEOVER, PLAYING }
+    public GameState state;
 
     public int curLevel;
+    public HealthBar healthBar;
+    public GameOver gameOverText;
 
 
 
     // Use this for initialization
-    void Awake()
+    void Start()
     {
 
         if (instance == null)
@@ -37,6 +42,12 @@ public class GameManager : MonoBehaviour
         }
 
         DontDestroyOnLoad(this);
+
+
+        healthBar = FindObjectOfType<HealthBar>();
+        gameOverText = FindObjectOfType<GameOver>();
+
+        state = GameState.PLAYING;
 
 
 
@@ -57,6 +68,37 @@ public class GameManager : MonoBehaviour
 
 
         }
+
+        switch (state)
+        {
+
+            case GameState.PLAYING:
+                break;
+            case GameState.GAMEOVER:
+                gameOverText.GetComponent<Text>().enabled = true;
+                Time.timeScale = 0;
+                break;
+
+        }
+
+
+    }
+
+
+    public void DoDamage(int damage)
+    {
+
+        healthBar.ChangeHealth(damage);
+
+        if (healthBar.curHealth <= 0)
+        {
+
+            state = GameState.GAMEOVER;
+
+        }
+
+
+
 
 
     }
