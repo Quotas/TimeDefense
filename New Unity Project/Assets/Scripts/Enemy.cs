@@ -13,10 +13,8 @@ public class Enemy : MonoBehaviour
 
     public List<Node> nodes;
 
-    public int health;
-
-
-
+    public int health = 100;
+    public float speed = 10f;
 
 
     #region EnemySprites
@@ -30,27 +28,24 @@ public class Enemy : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        var tmpnodes = FindObjectsOfType<Node>();
 
-        Array.Sort(tmpnodes);
+        nodes = FindObjectsOfType<Node>().OrderBy(node => node.order).ToList<Node>();
 
-        List<Node> nodes = new List<Node>(tmpnodes);
+        //switch (type)
+        //{
 
-        switch (type)
-        {
-
-            case EnemyType.BIG:
-                GetComponent<SpriteRenderer>().sprite = bigSprite;
-                break;
-            case EnemyType.FAST:
-                GetComponent<SpriteRenderer>().sprite = fastSprite;
-                break;
-            case EnemyType.SMALL:
-                GetComponent<SpriteRenderer>().sprite = smallSprite;
-                break;
+        //    case EnemyType.BIG:
+        //        GetComponent<SpriteRenderer>().sprite = bigSprite;
+        //        break;
+        //    case EnemyType.FAST:
+        //        GetComponent<SpriteRenderer>().sprite = fastSprite;
+        //        break;
+        //    case EnemyType.SMALL:
+        //        GetComponent<SpriteRenderer>().sprite = smallSprite;
+        //        break;
 
 
-        }
+        //}
 
 
     }
@@ -59,14 +54,14 @@ public class Enemy : MonoBehaviour
     void Update()
     {
 
-        if (health >= 0)
+        if (health <= 0)
         {
 
             level.RemoveEnemy(this);
 
         }
 
-        transform.Translate(Time.deltaTime * nodes.First().transform.position);
+        transform.position = Vector3.MoveTowards(transform.position, nodes.First().transform.position, speed * Time.deltaTime);
 
     }
 
@@ -80,14 +75,14 @@ public class Enemy : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
 
-        if (other.gameObject.tag == "Node")
+        if (other.tag == "Node")
         {
 
-            nodes.RemoveAt(0);
+            nodes.Remove(nodes.First());
 
         }
 
-        if (other.gameObject.tag == "EndNode")
+        if (other.tag == "EndNode")
         {
 
             Destroy(gameObject);
