@@ -8,7 +8,7 @@ public class Level : MonoBehaviour
 {
 
 
-
+    public GameManager gameManager;
     public List<Enemy> activeEnemies;
     public List<Tower> activeTowers;
 
@@ -33,6 +33,8 @@ public class Level : MonoBehaviour
     void Start()
     {
 
+        gameManager = FindObjectOfType<GameManager>();
+
         waveID.Add(1, wave1);
         waveID.Add(2, wave2);
         waveID.Add(3, wave3);
@@ -47,14 +49,8 @@ public class Level : MonoBehaviour
     void Update()
     {
 
-        if (waveFinished == false)
-        {
 
-            activeEnemies.AddRange(FindObjectsOfType<Enemy>());
-
-        }
-
-        if (activeEnemies.Count == 0 && inDelay == false)
+        if (FindObjectOfType<Enemy>() == null && inDelay == false)
         {
 
             waveFinished = true;
@@ -66,7 +62,9 @@ public class Level : MonoBehaviour
             }
             else
             {
+                gameManager.state = GameManager.GameState.WIN;
                 Debug.Log("You won?");
+                Time.timeScale = 0;
 
             }
 
@@ -76,13 +74,7 @@ public class Level : MonoBehaviour
 
     }
 
-    public void RemoveEnemy(Enemy enemy)
-    {
 
-        activeEnemies.Remove(enemy);
-
-
-    }
 
     void SpawnWave()
     {
