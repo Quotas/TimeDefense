@@ -1,201 +1,223 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public class Tower : MonoBehaviour {
+public class Tower : MonoBehaviour
+{
 
-	// Reference to objects
-	public Level level;
+    // Reference to objects
+    public Level level;
 
-	// Types of Towers and 
-	public enum Type {Base, Type2, Type3}; 
-	public Sprite[] towerGraphics;
-	public Projectile[] towerWeapons;
+    // Types of Towers and 
+    public enum Type { Base, Type2, Type3 }
+    public Sprite[] towerGraphics;
+    public Projectile[] towerWeapons;
 
-	// possibly temp
-	public struct Tier
-	{
-		public Tier(Vector2 stats)
-		{ 
-			damage = (int)stats.x; 
-			range = (int)stats.y;
-		}
+    // possibly temp
+    public struct Tier
+    {
+        public Tier(Vector2 stats)
+        {
+            damage = (int)stats.x;
+            range = (int)stats.y;
+        }
 
-		public int damage;
-		public int range;
+        public int damage;
+        public int range;
 
-	}
+    }
 
 
-	public Vector2 tier1;
-	public Vector2 tier2;
-	public Vector2 tier3;
-	private Tier m_Level1;
-	private Tier m_Level2;
-	private Tier m_Level3;
+    public Vector2 tier1;
+    public Vector2 tier2;
+    public Vector2 tier3;
+    private Tier m_Level1;
+    private Tier m_Level2;
+    private Tier m_Level3;
 
 
-	// Tower properties
-	public Type towerType;
-	public Projectile towerWeapon;
-	public Tier towerTier;
-	private List<Enemy> m_enemyList;
-	public Tier tier; 
+    // Tower properties
+    public Type towerType;
+    public Projectile towerWeapon;
+    public Tier towerTier;
+    public List<Enemy> m_enemyList;
+    public Tier tier;
 
 
-	// Tower Functionality
-	private CircleCollider2D m_towerRange;
+    // Tower Functionality
+    private CircleCollider2D m_towerRange;
 
 
-	// Use this for initialization
-	void Start () 
-	{
-		towerType = Type.Base;
+    // Use this for initialization
+    void Start()
+    {
+        towerType = Type.Base;
+        m_Level1 = new Tier(tier1);
+        m_Level2 = new Tier(tier2);
+        m_Level3 = new Tier(tier3);
 
-		m_Level1 = new Tier(tier1);
-		m_Level2 = new Tier(tier2);
-		m_Level3 = new Tier(tier3);
+        towerTier = m_Level1;
 
-		towerTier = m_Level1;
-	}
+        m_towerRange = GetComponent<CircleCollider2D>();
 
 
-	// Update is called once per frame
-	void Update () 
-	{
 
-		// Get the tpye change from the user
-		// menu interfation 
-		// firing at the enemies
 
-		switch (towerType) 
-		{
-		case Type.Base:
+        towerType = Type.Type2;
 
+        //just for debug
+    }
 
-			break;
-		case Type.Type2:
 
+    // Update is called once per frame
+    void Update()
+    {
 
+        // Get the tpye change from the user
+        // menu interfation 
+        // firing at the enemies
 
-			break;
+        switch (towerType)
+        {
+            case Type.Base:
 
-		case Type.Type3:
+                m_towerRange.radius = towerTier.range;
+                break;
+            case Type.Type2:
+                m_towerRange.radius = towerTier.range;
+                TowerFireProjectile();
 
 
+                break;
 
-			break;
-		}
+            case Type.Type3:
 
-		
-	}
 
 
-	void OnTriggerStay2D(Collider2D other)
-	{
+                break;
+        }
 
-		if (other.gameObject.tag == "Enemy") 
-		{
 
-			m_enemyList.Add (other.gameObject.GetComponent<Enemy>());
+    }
 
-		}
 
-	}
+    void OnTriggerEnter2D(Collider2D other)
+    {
 
+        if (other.gameObject.tag == "Enemy")
+        {
 
-	void OnTriggerLeave2D(Collider2D other)
-	{
+            m_enemyList.Add(other.gameObject.GetComponent<Enemy>());
 
-		if (other.gameObject.tag == "Enemy") 
-		{
+        }
 
-			m_enemyList.Remove (other.gameObject.GetComponent<Enemy>());
+    }
 
-		}
 
-	}
+    void OnTriggerExit2D(Collider2D other)
+    {
 
+        if (other.gameObject.tag == "Enemy")
+        {
 
-	void TowerFireProjectile()
-	{
+            m_enemyList.Remove(m_enemyList.First());
 
-		Transform target = null;
-	
-		if (m_enemyList.Count > 0) {
-		
-			// fire at the enemy
-			if (m_enemyList[0] != null)
-			{
-				target = m_enemyList [0].transform;
-			}
-		
-		}
+        }
 
-		if (target != null) 
-		{
-			Quaternion lookat = Quaternion.LookRotation (target.position - transform.position);
+    }
 
-			Projectile toInstanciate; 
 
-			toInstanciate = Instantiate (towerWeapon, transform.position, lookat);
+    void TowerFireProjectile()
+    {
 
-			// Set the parameters to fire at the unit.
-			toInstanciate.damage = towerTier.damage;
-			toInstanciate.target = target.position;
+        Enemy target = null;
 
-		}
+        if (m_enemyList.Count > 0)
+        {
 
-	}
+            // fire at the enemy
+            if (m_enemyList.First() != null)
+            {
+                target = m_enemyList.First();
+            }
+            else
+            {
 
+                m_enemyList.Remove(m_enemyList.First());
+            }
 
-	void TowerFireAreaEffect()
-	{
+            if (target == null)
+            {
+                return;
 
-		for (int i = 0; i < m_enemyList.Count; i++) {
+            }
+            Quaternion lookat = Quaternion.LookRotation(target.transform.position - transform.position);
 
-			m_enemyList [i].TakeDamage (towerTier.damage);
-			Instantiate (towerWeapon);
+            // Set the parameters to fire at the unit.
+            Projectile toInstanciate = towerWeapon;
+            toInstanciate.transform.position = transform.position;
+            toInstanciate.damage = towerTier.damage;
+            toInstanciate.target = m_enemyList.First();
 
-		}
-		
-	}
+            Instantiate(toInstanciate);
 
+        }
 
-	public void ChangeType(Type newTowerType)
-	{
 
-		towerType = newTowerType;
+    }
 
-		switch (towerType) {
-		case Type.Base:
-			gameObject.GetComponent<SpriteRenderer> ().sprite = towerGraphics [0];
-			towerWeapon = towerWeapons [0];
-			break;
-		case Type.Type2:
-			gameObject.GetComponent<SpriteRenderer> ().sprite = towerGraphics [1];
-			towerWeapon = towerWeapons [1];
-			break;
-		case Type.Type3:
-			gameObject.GetComponent<SpriteRenderer> ().sprite = towerGraphics [2];
-			towerWeapon = towerWeapons [2];
-			break;
 
-		}
+    void TowerFireAreaEffect()
+    {
 
-		// setup the range
-		m_towerRange.radius = towerTier.range;
-	}
+        for (int i = 0; i < m_enemyList.Count; i++)
+        {
 
+            m_enemyList[i].TakeDamage(towerTier.damage);
+            Instantiate(towerWeapon);
 
-	public void reset()
-	{
+        }
 
-		// For if the player sells the tower
+    }
 
-		towerType = Type.Base;
-		towerTier = m_Level1;
 
-	}
+    public void ChangeType(Type newTowerType)
+    {
+
+        towerType = newTowerType;
+
+        switch (towerType)
+        {
+            case Type.Base:
+                gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[0];
+                towerWeapon = towerWeapons[0];
+                break;
+            case Type.Type2:
+                gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[1];
+                towerWeapon = towerWeapons[1];
+                break;
+            case Type.Type3:
+                gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[2];
+                towerWeapon = towerWeapons[2];
+                break;
+
+        }
+
+        // setup the range
+
+        m_towerRange.radius = towerTier.range;
+    }
+
+
+    public void reset()
+    {
+
+        // For if the player sells the tower
+
+        towerType = Type.Base;
+        towerTier = m_Level1;
+
+    }
 
 }

@@ -15,7 +15,7 @@ public class Enemy : MonoBehaviour
     public List<Node> nodes;
 
 
-    public int health = 100;
+    public int health = 1000;
     public int damage = 1;
     public float speed = 10f;
 
@@ -61,7 +61,7 @@ public class Enemy : MonoBehaviour
         if (health <= 0)
         {
 
-            level.RemoveEnemy(this);
+            Destroy(this.gameObject);
 
         }
 

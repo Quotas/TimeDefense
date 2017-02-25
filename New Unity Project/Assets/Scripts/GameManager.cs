@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
 
     public Level[] levels;
 
-    public enum GameState { GAMEOVER, PLAYING }
+    public enum GameState { GAMEOVER, PLAYING, WIN }
     public GameState state;
 
     public int curLevel;
@@ -74,6 +74,10 @@ public class GameManager : MonoBehaviour
 
             case GameState.PLAYING:
                 break;
+            case GameState.WIN:
+                gameOverText.GetComponent<Text>().text = "WIN";
+                gameOverText.GetComponent<Text>().enabled = true;
+                break;
             case GameState.GAMEOVER:
                 gameOverText.GetComponent<Text>().enabled = true;
                 Time.timeScale = 0;
@@ -96,10 +100,6 @@ public class GameManager : MonoBehaviour
             state = GameState.GAMEOVER;
 
         }
-
-
-
-
 
     }
 
