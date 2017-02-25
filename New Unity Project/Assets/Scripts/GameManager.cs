@@ -61,13 +61,4 @@ public class GameManager : MonoBehaviour
 
     }
 
-    void SpawnWave()
-    {
-
-
-
-
-
-
-    }
 }

@@ -79,6 +79,8 @@
     <Compile Include="Assets\Scripts\GameManager.cs" />
     <Compile Include="Assets\Scripts\Level.cs" />
     <Compile Include="Assets\Scripts\Node.cs" />
+    <Compile Include="Assets\Scripts\Projectile.cs" />
+    <Compile Include="Assets\Scripts\SpawnPoint.cs" />
     <Compile Include="Assets\Scripts\Tower.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
