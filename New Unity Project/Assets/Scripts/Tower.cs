@@ -6,7 +6,6 @@ public class Tower : MonoBehaviour {
 
 	// Reference to objects
 	public Level level;
-	public Tier tier; 
 
 	// Types of Towers and 
 	public enum Type {Base, Type2, Type3}; 
@@ -40,7 +39,8 @@ public class Tower : MonoBehaviour {
 	public Type towerType;
 	public Projectile towerWeapon;
 	public Tier towerTier;
-	private List<GameObject> m_enemyList;
+	private List<Enemy> m_enemyList;
+	public Tier tier; 
 
 
 	// Tower Functionality
@@ -65,12 +65,12 @@ public class Tower : MonoBehaviour {
 	{
 
 		// Get the tpye change from the user
-
+		// menu interfation 
+		// firing at the enemies
 
 		switch (towerType) 
 		{
 		case Type.Base:
-
 
 
 			break;
@@ -97,7 +97,7 @@ public class Tower : MonoBehaviour {
 		if (other.gameObject.tag == "Enemy") 
 		{
 
-			m_enemyList.Add (other.gameObject);
+			m_enemyList.Add (other.gameObject.GetComponent<Enemy>());
 
 		}
 
@@ -110,7 +110,7 @@ public class Tower : MonoBehaviour {
 		if (other.gameObject.tag == "Enemy") 
 		{
 
-			m_enemyList.Remove (other.gameObject);
+			m_enemyList.Remove (other.gameObject.GetComponent<Enemy>());
 
 		}
 
@@ -137,7 +137,13 @@ public class Tower : MonoBehaviour {
 			Quaternion lookat = Quaternion.LookRotation (target.position - transform.position);
 
 			Projectile toInstanciate; 
+
 			toInstanciate = Instantiate (towerWeapon, transform.position, lookat);
+
+			// Set the parameters to fire at the unit.
+			toInstanciate.damage = towerTier.damage;
+			toInstanciate.target = target.position;
+
 		}
 
 	}
@@ -149,7 +155,8 @@ public class Tower : MonoBehaviour {
 		for (int i = 0; i < m_enemyList.Count; i++) {
 
 			m_enemyList [i].TakeDamage (towerTier.damage);
-		
+			Instantiate (towerWeapon);
+
 		}
 		
 	}
@@ -160,7 +167,7 @@ public class Tower : MonoBehaviour {
 
 		towerType = newTowerType;
 
-		switch (newTowerType) {
+		switch (towerType) {
 		case Type.Base:
 			gameObject.GetComponent<SpriteRenderer> ().sprite = towerGraphics [0];
 			towerWeapon = towerWeapons [0];
@@ -175,11 +182,16 @@ public class Tower : MonoBehaviour {
 			break;
 
 		}
+
+		// setup the range
+		m_towerRange.radius = towerTier.range;
 	}
 
 
 	public void reset()
 	{
+
+		// For if the player sells the tower
 
 		towerType = Type.Base;
 		towerTier = m_Level1;
