@@ -53,7 +53,7 @@ public class Projectile : MonoBehaviour
 
             if (transform.localScale.x > aoeRange)
             {
-                Destroy(gameObject);
+                Destroy(this.gameObject);
             }
 
         }
