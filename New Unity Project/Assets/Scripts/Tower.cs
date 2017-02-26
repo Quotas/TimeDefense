@@ -11,10 +11,16 @@ public class Tower : MonoBehaviour
 
     // Types of Towers and 
     public enum Type { Base, Type2, Type3 }
-    public Sprite[] towerGraphics;
-    public Projectile[] towerWeapons;
 
-    // possibly temp
+	[Header("Tower Types and Projectiles")]
+    public Sprite[] towerGraphics;
+	[Tooltip("Make sure to ensure the order or towers and Projectiles are the same")]
+    public Projectile[] towerWeapons;
+	[Tooltip("Make sure to ensure the order or towers and Projectiles are the same")]
+	public float[] towerRate;
+
+
+    // Structure for applying damage and range settings 
     public struct Tier
     {
         public Tier(Vector2 stats)
@@ -27,11 +33,16 @@ public class Tower : MonoBehaviour
         public int range;
 
     }
-
-
+		
+	[Header("Upgrade Modifiers (X is damage, Y is range")]
+	[Tooltip("Level 1")]
     public Vector2 tier1;
+	[Tooltip("Level 2")]
     public Vector2 tier2;
+	[Tooltip("Level 3")]
     public Vector2 tier3;
+
+	// Private leave.
     private Tier m_Level1;
     private Tier m_Level2;
     private Tier m_Level3;
@@ -43,7 +54,8 @@ public class Tower : MonoBehaviour
     public Tier towerTier;
     public List<Enemy> m_enemyList;
     public Tier tier;
-
+	public float timer;
+	public bool isAOEWeapon;
 
     // Tower Functionality
     private CircleCollider2D m_towerRange;
@@ -61,10 +73,9 @@ public class Tower : MonoBehaviour
 
         m_towerRange = GetComponent<CircleCollider2D>();
 
+		ChangeType (Type.Type2);
 
-
-
-        towerType = Type.Type2;
+		timer = 0.0f;
 
         //just for debug
     }
@@ -80,24 +91,46 @@ public class Tower : MonoBehaviour
 
         switch (towerType)
         {
+
             case Type.Base:
-
-                m_towerRange.radius = towerTier.range;
+			
+			if (timer > towerRate [(int)Type.Base]) {
+				if (isAOEWeapon == false) {
+					TowerFireProjectile ();
+				} else {
+					TowerFireAreaEffect();
+				}
+			}
+				
                 break;
-            case Type.Type2:
-                m_towerRange.radius = towerTier.range;
-                TowerFireProjectile();
 
+		case Type.Type2:
+			
+			if (timer > towerRate [(int)Type.Type2]) {
+				if (isAOEWeapon == false) {
+					TowerFireProjectile ();
+				} else {
+					TowerFireAreaEffect();
+				}
+
+			}
 
                 break;
 
             case Type.Type3:
-
-
-
+			
+			if (timer > towerRate [(int)Type.Type3]) {
+				if (isAOEWeapon == false) {
+					TowerFireProjectile ();
+				} else {
+					TowerFireAreaEffect();
+				}
+			}
+				
                 break;
         }
 
+		timer += Time.deltaTime;
 
     }
 
@@ -159,8 +192,10 @@ public class Tower : MonoBehaviour
             toInstanciate.transform.position = transform.position;
             toInstanciate.damage = towerTier.damage;
             toInstanciate.target = m_enemyList.First();
-
             Instantiate(toInstanciate);
+
+			// reset the timer
+			timer = 0.0f;
 
         }
 
@@ -169,17 +204,20 @@ public class Tower : MonoBehaviour
 
 
     void TowerFireAreaEffect()
-    {
+	{
+		if (m_enemyList.Count > 0) {
 
-        for (int i = 0; i < m_enemyList.Count; i++)
-        {
+			Projectile toInstanciate = towerWeapon;
+			toInstanciate.transform.position = transform.position;
+			toInstanciate.damage = towerTier.damage;
+			// toInstanciate.target = m_enemyList.First ();
+			Instantiate (toInstanciate);
 
-            m_enemyList[i].TakeDamage(towerTier.damage);
-            Instantiate(towerWeapon);
-
-        }
-
-    }
+			// reset the timer
+			timer = 0.0f;
+        
+		}
+	}
 
 
     public void ChangeType(Type newTowerType)
