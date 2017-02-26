@@ -20,29 +20,33 @@ public class Tower : MonoBehaviour
     public Projectile[] towerWeapons;
     [Tooltip("Make sure to ensure the order or towers and Projectiles are the same")]
     public float[] towerRate;
+    [Tooltip("Edit Make sure to ensure the order or towers and Projectiles are the same")]
+    public bool[] isAOEWeapon;
 
 
     // Structure for applying damage and range settings 
     public struct Tier
     {
-        public Tier(Vector2 stats)
+        public Tier(Vector3 stats)
         {
             damage = (int)stats.x;
             range = (int)stats.y;
+            upgradeCost = (int)stats.z;
         }
 
         public int damage;
         public int range;
+        public int upgradeCost;
 
     }
 
-    [Header("Upgrade Modifiers (X is damage, Y is range")]
+    [Header("Upgrade Modifiers (X is damage, Y is range, Z is cost)")]
     [Tooltip("Level 1")]
-    public Vector2 tier1;
+    public Vector3 tier1;
     [Tooltip("Level 2")]
-    public Vector2 tier2;
+    public Vector3 tier2;
     [Tooltip("Level 3")]
-    public Vector2 tier3;
+    public Vector3 tier3;
 
     // Private leave.
     private Tier m_Level1;
@@ -57,7 +61,6 @@ public class Tower : MonoBehaviour
     public List<Enemy> m_enemyList;
     public Tier tier;
     public float timer;
-    public bool isAOEWeapon;
 
     public bool selected = false;
 
@@ -98,10 +101,6 @@ public class Tower : MonoBehaviour
     void Update()
     {
 
-        // Get the tpye change from the user
-        // menu interfation 
-        // firing at the enemies
-
 
         switch (towerType)
         {
@@ -110,14 +109,7 @@ public class Tower : MonoBehaviour
 
                 if (timer > towerRate[(int)Type.Base])
                 {
-                    if (isAOEWeapon == false)
-                    {
-                        TowerFireProjectile();
-                    }
-                    else
-                    {
-                        TowerFireAreaEffect();
-                    }
+                    towerFire();
                 }
 
                 break;
@@ -126,14 +118,7 @@ public class Tower : MonoBehaviour
 
                 if (timer > towerRate[(int)Type.Type2])
                 {
-                    if (isAOEWeapon == false)
-                    {
-                        TowerFireProjectile();
-                    }
-                    else
-                    {
-                        TowerFireAreaEffect();
-                    }
+                    towerFire();
 
                 }
 
@@ -143,14 +128,7 @@ public class Tower : MonoBehaviour
 
                 if (timer > towerRate[(int)Type.Type3])
                 {
-                    if (isAOEWeapon == false)
-                    {
-                        TowerFireProjectile();
-                    }
-                    else
-                    {
-                        TowerFireAreaEffect();
-                    }
+                    towerFire();
                 }
 
                 break;
@@ -158,6 +136,18 @@ public class Tower : MonoBehaviour
 
         timer += Time.deltaTime;
 
+    }
+
+    void towerFire()
+    {
+        if (isAOEWeapon[(int)Type.Base] == false)
+        {
+            TowerFireProjectile();
+        }
+        else
+        {
+            TowerFireAreaEffect();
+        }
     }
 
 
@@ -296,13 +286,58 @@ public class Tower : MonoBehaviour
     }
 
 
-    public void reset()
+
+    public void Reset()
     {
 
         // For if the player sells the tower
 
         towerType = Type.Base;
         towerTier = m_Level1;
+
+    }
+
+    public int UpgradeCost()
+    {
+
+        // Return the cost of the next upgrade returns -1 if no upgrade possible
+
+        int cost = -1;
+
+        if (towerTier.Equals(m_Level1))
+        {
+            cost = m_Level2.upgradeCost;
+        }
+        else if (towerTier.Equals(m_Level2))
+        {
+            cost = m_Level3.upgradeCost;
+        }
+
+        return cost;
+
+    }
+
+    public bool UpgradeTower()
+    {
+
+        if (towerTier.Equals(m_Level3) == false)
+        {
+
+            if (towerTier.Equals(m_Level1))
+            {
+                towerTier = m_Level2;
+            }
+            else if (towerTier.Equals(m_Level2))
+            {
+                towerTier = m_Level3;
+            }
+
+            return true; // upgraded.
+
+        }
+
+
+        return false; // If the tower cannot be upgraded.
 
     }
 
