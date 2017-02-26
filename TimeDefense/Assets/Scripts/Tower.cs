@@ -12,7 +12,7 @@ public class Tower : MonoBehaviour
     public Clickable clicker;
 
     // Types of Towers and 
-    public enum Type { Base, Type2, Type3 }
+    public enum Type { BASE, TEDDY, SLING, SPEAKER, CANNON }
 
     [Header("Tower Types and Projectiles")]
     public Sprite[] towerGraphics;
@@ -71,7 +71,7 @@ public class Tower : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        towerType = Type.Base;
+        towerType = Type.BASE;
         m_Level1 = new Tier(tier1);
         m_Level2 = new Tier(tier2);
         m_Level3 = new Tier(tier3);
@@ -81,7 +81,6 @@ public class Tower : MonoBehaviour
         m_towerRange = GetComponent<CircleCollider2D>();
         background = FindObjectOfType<Background>();
 
-        ChangeType(Type.Type2);
 
         if (transform.Find("Clickable") != null)
         {
@@ -93,6 +92,8 @@ public class Tower : MonoBehaviour
         }
         timer = 0.0f;
 
+
+		ChangeType(Type.CANNON);
         //just for debug
     }
 
@@ -105,18 +106,18 @@ public class Tower : MonoBehaviour
         switch (towerType)
         {
 
-            case Type.Base:
+            case Type.BASE:
 
-                if (timer > towerRate[(int)Type.Base])
+                if (timer > towerRate[(int)Type.BASE])
                 {
                     towerFire();
                 }
 
                 break;
 
-            case Type.Type2:
+            case Type.SLING:
 
-                if (timer > towerRate[(int)Type.Type2])
+                if (timer > towerRate[(int)Type.SLING])
                 {
                     towerFire();
 
@@ -124,9 +125,27 @@ public class Tower : MonoBehaviour
 
                 break;
 
-            case Type.Type3:
+            case Type.SPEAKER:
 
-                if (timer > towerRate[(int)Type.Type3])
+                if (timer > towerRate[(int)Type.SPEAKER])
+                {
+                    towerFire();
+                }
+
+                break;
+
+            case Type.CANNON:
+
+                if (timer > towerRate[(int)Type.CANNON])
+                {
+                    towerFire();
+                }
+
+                break;
+
+            case Type.TEDDY:
+
+                if (timer > towerRate[(int)Type.TEDDY])
                 {
                     towerFire();
                 }
@@ -140,7 +159,7 @@ public class Tower : MonoBehaviour
 
     void towerFire()
     {
-        if (isAOEWeapon[(int)Type.Base] == false)
+        if (isAOEWeapon[(int)towerType] == false)
         {
             TowerFireProjectile();
         }
@@ -265,17 +284,25 @@ public class Tower : MonoBehaviour
 
         switch (towerType)
         {
-            case Type.Base:
+            case Type.BASE:
                 gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[0];
                 towerWeapon = towerWeapons[0];
                 break;
-            case Type.Type2:
+            case Type.SLING:
                 gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[1];
                 towerWeapon = towerWeapons[1];
                 break;
-            case Type.Type3:
+            case Type.CANNON:
                 gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[2];
                 towerWeapon = towerWeapons[2];
+                break;
+            case Type.SPEAKER:
+                gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[3];
+                towerWeapon = towerWeapons[3];
+                break;
+            case Type.TEDDY:
+                gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[4];
+                towerWeapon = towerWeapons[4];
                 break;
 
         }
@@ -292,7 +319,7 @@ public class Tower : MonoBehaviour
 
         // For if the player sells the tower
 
-        towerType = Type.Base;
+        towerType = Type.BASE;
         towerTier = m_Level1;
 
     }
