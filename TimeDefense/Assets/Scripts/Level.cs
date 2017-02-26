@@ -27,6 +27,7 @@ public class Level : MonoBehaviour
     public bool inDelay;
     public float waveDelay = 5f;
     public int curWave = 1;
+    public bool spawningWave;
 
 
     // Use this for initialization
@@ -76,8 +77,23 @@ public class Level : MonoBehaviour
 
 
 
+    public void NextWave()
+    {
+
+        if (curWave != waveID.Count && spawningWave != true)
+        {
+
+            SpawnWave();
+
+        }
+
+
+    }
+
     void SpawnWave()
     {
+
+        spawningWave = true;
         var xOffset = 0;
         inDelay = false;
 
@@ -92,6 +108,8 @@ public class Level : MonoBehaviour
         }
 
         waveFinished = false;
+
+        spawningWave = false;
 
 
 

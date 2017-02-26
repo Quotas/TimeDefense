@@ -14,6 +14,9 @@ public class Enemy : MonoBehaviour
 
     public List<Node> nodes;
 
+    public Animation deadAnim;
+    public Animation walkAnim;
+
 
     public int health = 1000;
     public int damage = 1;
@@ -61,7 +64,11 @@ public class Enemy : MonoBehaviour
         if (health <= 0)
         {
 
-            Destroy(this.gameObject);
+            gameManager.AddCoins(50);
+
+            deadAnim.Play();
+
+            Destroy(this.gameObject, 2f);
 
         }
 
@@ -99,10 +106,6 @@ public class Enemy : MonoBehaviour
 
 
         }
-
-
-
-
 
 
 

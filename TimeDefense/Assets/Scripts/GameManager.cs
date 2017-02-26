@@ -20,7 +20,16 @@ public class GameManager : MonoBehaviour
 
     public int curLevel;
     public HealthBar healthBar;
+    public CurrencyBar currencyBar;
     public GameOver gameOverText;
+
+    Button pillowButton;
+    Button teddyButton;
+    Button slingButton;
+    Button cannonButton;
+    Button speakerButton;
+
+
 
 
     public Background background;
@@ -51,9 +60,20 @@ public class GameManager : MonoBehaviour
         healthBar = FindObjectOfType<HealthBar>();
         gameOverText = FindObjectOfType<GameOver>();
         background = FindObjectOfType<Background>();
+        currencyBar = FindObjectOfType<CurrencyBar>();
+
+
+        teddyButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Teddy").GetComponent<Button>();
+        slingButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Slinger").GetComponent<Button>();
+        cannonButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Pillow").GetComponent<Button>();
+        //speakerButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Speaker").GetComponent<Button>();
+
+
+
 
 
         state = GameState.PLAYING;
+
 
 
 
@@ -77,6 +97,39 @@ public class GameManager : MonoBehaviour
 
         curTower = background.curSelected;
 
+
+        if (curTower != null)
+        {
+
+            foreach (Transform child in FindObjectOfType<Canvas>().transform.FindChild("ButtonManager"))
+            {
+
+                child.GetComponent<Button>().interactable = true;
+
+            }
+
+            teddyButton.onClick.AddListener(delegate { curTower.ChangeType(Tower.Type.TEDDY); });
+            slingButton.onClick.AddListener(delegate { curTower.ChangeType(Tower.Type.SLING); });
+            cannonButton.onClick.AddListener(delegate { curTower.ChangeType(Tower.Type.CANNON); });
+            //speakerButton.onClick.AddListener(delegate { curTower.ChangeType(Tower.Type.SPEAKER); });
+
+
+        }
+
+
+        if (curTower == null)
+        {
+
+            foreach (Transform child in FindObjectOfType<Canvas>().transform.FindChild("ButtonManager"))
+            {
+
+                child.GetComponent<Button>().interactable = false;
+
+
+            }
+
+
+        }
 
 
         if (Input.GetMouseButtonDown(0))
@@ -114,6 +167,45 @@ public class GameManager : MonoBehaviour
 
     }
 
+
+    public void Buy(int amount)
+    {
+
+
+        currencyBar.curCurrency -= amount;
+
+
+    }
+
+    public void AddCoins(int amount)
+    {
+
+
+        currencyBar.curCurrency += amount;
+
+
+    }
+
+    public void Pause()
+    {
+
+        Time.timeScale = 0;
+
+    }
+
+    public void UnPause()
+    {
+
+        Time.timeScale = 1;
+
+    }
+
+    public void SpeedUp()
+    {
+
+        Time.timeScale = 2;
+
+    }
 
     public void DoDamage(int damage)
     {
