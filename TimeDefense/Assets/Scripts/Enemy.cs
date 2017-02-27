@@ -19,6 +19,8 @@ public class Enemy : MonoBehaviour
     public int damage = 1;
     public float speed = 10f;
 
+	public float deathTimer;
+	public float timer;
 
     #region EnemySprites
     public Sprite bigSprite;
@@ -31,6 +33,8 @@ public class Enemy : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+		
+		timer = 0.0f;
 
         gameManager = FindObjectOfType<GameManager>();
         nodes = FindObjectsOfType<Node>().OrderBy(node => node.order).ToList<Node>();
@@ -58,14 +62,24 @@ public class Enemy : MonoBehaviour
     void Update()
     {
 
-        if (health <= 0)
-        {
+		if (health <= 0) {
 
-            Destroy(this.gameObject);
+			gameObject.GetComponent<Animator> ().SetBool ("death", true);
+			gameObject.GetComponent<SpriteRenderer> ().sortingOrder = (int)(transform.position.y);
 
-        }
+			if (timer > deathTimer) {
+		
+				Destroy (this.gameObject);
+			}
 
-        transform.position = Vector3.MoveTowards(transform.position, nodes.First().transform.position, speed * Time.deltaTime);
+			timer += Time.deltaTime;
+
+		} else {
+			transform.position = Vector3.MoveTowards (transform.position, nodes.First ().transform.position, speed * Time.deltaTime);
+			gameObject.GetComponent<SpriteRenderer> ().sortingOrder = (int)(transform.position.y*100.0f);
+		}
+
+
 
     }
 

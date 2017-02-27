@@ -62,6 +62,8 @@ public class Tower : MonoBehaviour
     public Tier tier;
     public float timer;
 
+	public Type tempTower; // to show 
+
     public bool selected = false;
 
     // Tower Functionality
@@ -81,6 +83,8 @@ public class Tower : MonoBehaviour
         m_towerRange = GetComponent<CircleCollider2D>();
         background = FindObjectOfType<Background>();
 
+		gameObject.GetComponent<SpriteRenderer> ().sortingOrder = (int)transform.position.y;
+
 
         if (transform.Find("Clickable") != null)
         {
@@ -93,7 +97,7 @@ public class Tower : MonoBehaviour
         timer = 0.0f;
 
 
-		ChangeType(Type.CANNON);
+		ChangeType(tempTower);
         //just for debug
     }
 
