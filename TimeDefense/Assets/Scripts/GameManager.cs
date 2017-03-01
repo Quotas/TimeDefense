@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
 
     public Level[] levels;
 
-    public enum GameState { GAMEOVER, PLAYING, WIN }
+    public enum GameState { GAMEOVER, PLAYING, WIN, PAUSED }
     public GameState state;
 
     public int curLevel;
@@ -28,13 +28,8 @@ public class GameManager : MonoBehaviour
     public Button cannonButton;
     public Button speakerButton;
 
-
-
-
-    public Background background;
+	public Background background;
     public Tower curTower;
-
-
 
     // Use this for initialization
     void Start()
@@ -54,7 +49,6 @@ public class GameManager : MonoBehaviour
         }
 
         DontDestroyOnLoad(this);
-
 
         healthBar = FindObjectOfType<HealthBar>();
         gameOverText = FindObjectOfType<GameOver>();
@@ -216,12 +210,18 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public void SpeedUp()
-    {
+	public void SpeedUp()
+	{
 
-        Time.timeScale = 2;
+		if (Time.timeScale == 2)
+		{
+			Time.timeScale = 1;
+		} else
+		{
+			Time.timeScale = 2;
+		}
 
-    }
+	}
 
     public void DoDamage(int damage)
     {
@@ -236,5 +236,21 @@ public class GameManager : MonoBehaviour
         }
 
     }
+
+
+	public void PlayPause()
+	{
+
+		if (state == GameState.PLAYING)
+		{
+			Pause ();
+			state = GameState.PAUSED;
+		} else
+		{
+			UnPause ();
+			state = GameState.PLAYING;
+		}
+
+	}
 
 }
