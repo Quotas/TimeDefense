@@ -20,6 +20,7 @@ public class Enemy : MonoBehaviour
     public float speed = 10f;
 
 	public float deathTimer;
+    public bool dead;
 	public float timer;
 
     #region EnemySprites
@@ -64,19 +65,12 @@ public class Enemy : MonoBehaviour
 
 		if (health <= 0) {
 
-			gameObject.GetComponent<Animator> ().SetBool ("death", true);
-			gameObject.GetComponent<SpriteRenderer> ().sortingOrder = (int)(transform.position.y);
-
-			if (timer > deathTimer) {
-		
-				Destroy (this.gameObject);
-			}
-
-			timer += Time.deltaTime;
+            dead = true;
+            StartCoroutine(onDeath()); 
 
 		} else {
 			transform.position = Vector3.MoveTowards (transform.position, nodes.First ().transform.position, speed * Time.deltaTime);
-			gameObject.GetComponent<SpriteRenderer> ().sortingOrder = (int)(transform.position.y*100.0f);
+			
 		}
 
 
@@ -88,6 +82,15 @@ public class Enemy : MonoBehaviour
 
         health -= damage;
 
+    }
+
+    IEnumerator onDeath() {
+        gameObject.GetComponent<Animator>().SetBool("death", true);
+
+        transform.position = new Vector3(transform.position.x, transform.position.y, 10);
+
+        yield return new WaitForSeconds(gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).length + 1f);
+        Destroy(gameObject);
     }
 
     void OnTriggerEnter2D(Collider2D other)

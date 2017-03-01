@@ -89,7 +89,7 @@ public class Tower : MonoBehaviour
         if (transform.Find("Clickable") != null)
         {
 
-            clicker = transform.Find("Clickable").GetComponent<Clickable>();
+            clicker = transform.FindChild("Clickable").GetComponent<Clickable>();
             clicker.parent = this;
 
 
@@ -112,13 +112,7 @@ public class Tower : MonoBehaviour
 
             case Type.BASE:
 
-                if (timer > towerRate[(int)Type.BASE])
-                {
-                    towerFire();
-                }
-
                 break;
-
             case Type.SLING:
 
                 if (timer > towerRate[(int)Type.SLING])
@@ -185,6 +179,9 @@ public class Tower : MonoBehaviour
 
     public void OnClick()
     {
+        if (background.curSelected != null)
+            background.curSelected.Deselect();
+
         this.tag = "Selected";
         selected = true;
 
@@ -232,20 +229,23 @@ public class Tower : MonoBehaviour
             // fire at the enemy
             if (m_enemyList.First() != null)
             {
+
                 target = m_enemyList.First();
+
             }
-            else
+            else  
             {
 
                 m_enemyList.Remove(m_enemyList.First());
-            }
-
-            if (target == null)
-            {
                 return;
-
             }
-            Quaternion lookat = Quaternion.LookRotation(target.transform.position - transform.position);
+
+
+
+            if (target.dead == true) {
+                m_enemyList.Remove(target); 
+                return;
+            }
 
             // Set the parameters to fire at the unit.
             Projectile toInstanciate = towerWeapon;
