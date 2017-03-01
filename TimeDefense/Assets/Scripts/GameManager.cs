@@ -30,6 +30,7 @@ public class GameManager : MonoBehaviour
     public Button slingButton;
     public Button cannonButton;
     public Button speakerButton;
+    public Button upgradeButton;
 
 	public Background background;
     public Tower curTower;
@@ -39,7 +40,6 @@ public class GameManager : MonoBehaviour
     {
 
         levelScene = SceneManager.GetSceneByBuildIndex(0);
-        GUIScene = SceneManager.GetSceneByBuildIndex(1);
 
         if (instance == null)
         {
@@ -56,24 +56,17 @@ public class GameManager : MonoBehaviour
 
         DontDestroyOnLoad(this);
 
-<<<<<<< HEAD
-        if (GUIScene.isLoaded == false) {
 
-            SceneManager.LoadScene("GameUI", LoadSceneMode.Additive);
-=======
         healthBar = FindObjectOfType<HealthBar>();
         gameOverText = FindObjectOfType<GameOver>();
-        background = FindObjectOfType<Background>();
         currencyBar = FindObjectOfType<CurrencyBar>();
-
 
         teddyButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Teddy").GetComponent<Button>();
         slingButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Slinger").GetComponent<Button>();
         cannonButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Pillow").GetComponent<Button>();
-        //speakerButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Speaker").GetComponent<Button>();
->>>>>>> JamesBranch
+        speakerButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Speaker").GetComponent<Button>();
 
-        }
+        upgradeButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Upgrade").GetComponent<Button>();
 
         background = FindObjectOfType<Background>();
 
@@ -92,23 +85,7 @@ public class GameManager : MonoBehaviour
     void Update()
     {
 
-
-        if (healthBar == null || gameOverText == null ||  currencyBar == null || teddyButton == null || slingButton ==  null || cannonButton == null) {
-            
-
-            healthBar = FindObjectOfType<HealthBar>();
-            gameOverText = FindObjectOfType<GameOver>();
-            currencyBar = FindObjectOfType<CurrencyBar>();
-
-
-            teddyButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Teddy").GetComponent<Button>();
-            slingButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Slinger").GetComponent<Button>();
-            cannonButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Pillow").GetComponent<Button>();
-            //speakerButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Speaker").GetComponent<Button>();
-
-        }
-
-        
+       
 
 
         if (curTower != background.curSelected)
@@ -132,7 +109,9 @@ public class GameManager : MonoBehaviour
             teddyButton.onClick.AddListener(() => curTower.ChangeType(Tower.TowerType.TEDDY));
             slingButton.onClick.AddListener(() => curTower.ChangeType(Tower.TowerType.SLING));
             cannonButton.onClick.AddListener(() => curTower.ChangeType(Tower.TowerType.CANNON));
-            //speakerButton.onClick.AddListener(delegate { curTower.ChangeType(Tower.Type.SPEAKER); });
+            speakerButton.onClick.AddListener(() => curTower.ChangeType(Tower.TowerType.SPEAKER));
+
+            upgradeButton.onClick.AddListener(() => curTower.UpgradeTower());
 
         }
 
@@ -174,11 +153,13 @@ public class GameManager : MonoBehaviour
             case GameState.PLAYING:
                 break;
             case GameState.WIN:
-                gameOverText.GetComponent<Text>().text = "WIN";
-                gameOverText.GetComponent<Text>().enabled = true;
+                gameOverText.GetComponent<Image>().sprite = gameOverText.win; 
+                gameOverText.GetComponent<Image>().enabled = true;
+                Time.timeScale = 0;
                 break;
             case GameState.GAMEOVER:
-                gameOverText.GetComponent<Text>().enabled = true;
+                gameOverText.GetComponent<Image>().sprite = gameOverText.lose;
+                gameOverText.GetComponent<Image>().enabled = true;
                 Time.timeScale = 0;
                 break;
 
@@ -232,13 +213,10 @@ public class GameManager : MonoBehaviour
 
     }
 
-<<<<<<< HEAD
+
      public void SpeedUp()
     {
-=======
-	public void SpeedUp()
-	{
->>>>>>> JamesBranch
+
 
 		if (Time.timeScale == 2)
 		{
@@ -280,19 +258,5 @@ public class GameManager : MonoBehaviour
     }
 
 
-	public void PlayPause()
-	{
-
-		if (state == GameState.PLAYING)
-		{
-			Pause ();
-			state = GameState.PAUSED;
-		} else
-		{
-			UnPause ();
-			state = GameState.PLAYING;
-		}
-
-	}
 
 }

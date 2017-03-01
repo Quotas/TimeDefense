@@ -64,8 +64,6 @@ public class Tower : MonoBehaviour
     public Tier tier;
     public float timer;
 
-	public TowerType tempTower; // to show 
-
     public bool selected = false;
 
     // Tower Functionality
@@ -347,48 +345,30 @@ public class Tower : MonoBehaviour
 
     }
 
-    public int UpgradeCost()
+
+    public void UpgradeTower()
     {
 
-        // Return the cost of the next upgrade returns -1 if no upgrade possible
-
-        int cost = -1;
-
-        if (towerTier.Equals(m_Level1))
-        {
-            cost = m_Level2.upgradeCost;
-        }
-        else if (towerTier.Equals(m_Level2))
-        {
-            cost = m_Level3.upgradeCost;
-        }
-
-        return cost;
-
-    }
-
-    public bool UpgradeTower()
-    {
 
         if (towerTier.Equals(m_Level3) == false)
         {
-
-            if (towerTier.Equals(m_Level1))
+            
+            if (towerTier.Equals(m_Level1) && gameManager.CanBuy(m_Level2.upgradeCost))
             {
                 towerTier = m_Level2;
+                gameManager.Buy(m_Level2.upgradeCost);
             }
-            else if (towerTier.Equals(m_Level2))
+            else if (towerTier.Equals(m_Level2) && gameManager.CanBuy(m_Level3.upgradeCost))
             {
                 towerTier = m_Level3;
+                gameManager.Buy(m_Level2.upgradeCost);
             }
-
-            return true; // upgraded.
 
         }
 
-
-        return false; // If the tower cannot be upgraded.
+        Debug.Log("Tower Upgraded");
 
     }
+
 
 }
