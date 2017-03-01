@@ -7,12 +7,13 @@ public class Tower : MonoBehaviour
 {
 
     // Reference to objects
+    public GameManager gameManager;
     public Level level;
     public Background background;
     public Clickable clicker;
 
     // Types of Towers and 
-    public enum Type { BASE, TEDDY, SLING, SPEAKER, CANNON }
+    public enum TowerType { BASE, TEDDY, SLING, CANNON, SPEAKER }
 
     [Header("Tower Types and Projectiles")]
     public Sprite[] towerGraphics;
@@ -55,14 +56,15 @@ public class Tower : MonoBehaviour
 
 
     // Tower properties
-    public Type towerType;
+    public TowerType towerType;
     public Projectile towerWeapon;
     public Tier towerTier;
     public List<Enemy> m_enemyList;
+    public int[] cost;
     public Tier tier;
     public float timer;
 
-	public Type tempTower; // to show 
+	public TowerType tempTower; // to show 
 
     public bool selected = false;
 
@@ -73,7 +75,11 @@ public class Tower : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        towerType = Type.BASE;
+
+        gameManager = FindObjectOfType<GameManager>();
+
+
+        towerType = TowerType.BASE;
         m_Level1 = new Tier(tier1);
         m_Level2 = new Tier(tier2);
         m_Level3 = new Tier(tier3);
@@ -97,7 +103,7 @@ public class Tower : MonoBehaviour
         timer = 0.0f;
 
 
-		ChangeType(tempTower);
+		ChangeType(towerType);
         //just for debug
     }
 
@@ -110,12 +116,12 @@ public class Tower : MonoBehaviour
         switch (towerType)
         {
 
-            case Type.BASE:
+            case TowerType.BASE:
 
                 break;
-            case Type.SLING:
+            case TowerType.SLING:
 
-                if (timer > towerRate[(int)Type.SLING])
+                if (timer > towerRate[(int)TowerType.SLING])
                 {
                     towerFire();
 
@@ -123,27 +129,27 @@ public class Tower : MonoBehaviour
 
                 break;
 
-            case Type.SPEAKER:
+            case TowerType.SPEAKER:
 
-                if (timer > towerRate[(int)Type.SPEAKER])
+                if (timer > towerRate[(int)TowerType.SPEAKER])
                 {
                     towerFire();
                 }
 
                 break;
 
-            case Type.CANNON:
+            case TowerType.CANNON:
 
-                if (timer > towerRate[(int)Type.CANNON])
+                if (timer > towerRate[(int)TowerType.CANNON])
                 {
                     towerFire();
                 }
 
                 break;
 
-            case Type.TEDDY:
+            case TowerType.TEDDY:
 
-                if (timer > towerRate[(int)Type.TEDDY])
+                if (timer > towerRate[(int)TowerType.TEDDY])
                 {
                     towerFire();
                 }
@@ -281,39 +287,52 @@ public class Tower : MonoBehaviour
     }
 
 
-    public void ChangeType(Type newTowerType)
+    public void ChangeType(TowerType newTowerType)
     {
 
-        towerType = newTowerType;
+        if (newTowerType != TowerType.BASE) {
 
-        switch (towerType)
-        {
-            case Type.BASE:
-                gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[0];
-                towerWeapon = towerWeapons[0];
-                break;
-            case Type.SLING:
-                gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[1];
-                towerWeapon = towerWeapons[1];
-                break;
-            case Type.CANNON:
-                gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[2];
-                towerWeapon = towerWeapons[2];
-                break;
-            case Type.SPEAKER:
-                gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[3];
-                towerWeapon = towerWeapons[3];
-                break;
-            case Type.TEDDY:
-                gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[4];
-                towerWeapon = towerWeapons[4];
-                break;
+            if (!gameManager.CanBuy(cost[(int)newTowerType]))
+            { 
+
+                Debug.Log("Cant afford to buy tower"); 
+                return;
+
+            }
+
+            gameManager.Buy(cost[(int)newTowerType]);
+            towerType = newTowerType;
+
+            switch (towerType)
+            {
+                case TowerType.BASE:
+                    gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[0];
+                    towerWeapon = towerWeapons[0];
+                    break;
+                case TowerType.SLING:
+                    gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[1];
+                    towerWeapon = towerWeapons[1];
+                    break;
+                case TowerType.CANNON:
+                    gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[2];
+                    towerWeapon = towerWeapons[2];
+                    break;
+                case TowerType.SPEAKER:
+                    gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[3];
+                    towerWeapon = towerWeapons[3];
+                    break;
+                case TowerType.TEDDY:
+                    gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[4];
+                    towerWeapon = towerWeapons[4];
+                    break;
+
+            }
+
+            // setup the range
 
         }
 
-        // setup the range
-
-        m_towerRange.radius = towerTier.range;
+            m_towerRange.radius = towerTier.range;
     }
 
 
@@ -323,7 +342,7 @@ public class Tower : MonoBehaviour
 
         // For if the player sells the tower
 
-        towerType = Type.BASE;
+        towerType = TowerType.BASE;
         towerTier = m_Level1;
 
     }

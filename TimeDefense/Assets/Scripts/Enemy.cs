@@ -20,6 +20,7 @@ public class Enemy : MonoBehaviour
     public float speed = 10f;
 
 	public float deathTimer;
+    public int coins;
     public bool dead;
 	public float timer;
 
@@ -65,8 +66,13 @@ public class Enemy : MonoBehaviour
 
 		if (health <= 0) {
 
+            if (dead == false)
+                StartCoroutine(onDeath());
+
+
             dead = true;
-            StartCoroutine(onDeath()); 
+
+           
 
 		} else {
 			transform.position = Vector3.MoveTowards (transform.position, nodes.First ().transform.position, speed * Time.deltaTime);
@@ -85,6 +91,9 @@ public class Enemy : MonoBehaviour
     }
 
     IEnumerator onDeath() {
+
+        gameManager.AddCoins(coins); 
+
         gameObject.GetComponent<Animator>().SetBool("death", true);
 
         transform.position = new Vector3(transform.position.x, transform.position.y, 10);

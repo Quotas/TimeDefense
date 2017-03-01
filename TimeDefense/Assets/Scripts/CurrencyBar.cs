@@ -14,8 +14,8 @@ public class CurrencyBar : MonoBehaviour
 
     void Start()
     {
-        currencyText = transform.Find("Coins").GetComponent<Text>();
-        curCurrency = 0;
+        currencyText = transform.Find("CurrencyText").GetComponent<Text>();
+        curCurrency = 500;
 
 
     }

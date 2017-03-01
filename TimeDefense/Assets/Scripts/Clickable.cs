@@ -8,12 +8,6 @@ public class Clickable : MonoBehaviour
     // Use this for initialization
     public Object parent;
 
-    void Start() {
-
-        parent = transform.parent;
-
-    }
-
 
     void OnMouseDown()
     {

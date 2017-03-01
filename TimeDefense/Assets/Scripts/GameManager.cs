@@ -15,8 +15,11 @@ public class GameManager : MonoBehaviour
 
     public Level[] levels;
 
-    public enum GameState { GAMEOVER, PLAYING, WIN }
+    public enum GameState { GAMEOVER, PLAYING, WIN, PAUSED }
     public GameState state;
+
+    public Scene levelScene;
+    public Scene GUIScene;
 
     public int curLevel;
     public HealthBar healthBar;
@@ -40,6 +43,9 @@ public class GameManager : MonoBehaviour
     void Start()
     {
 
+        levelScene = SceneManager.GetSceneByBuildIndex(0);
+        GUIScene = SceneManager.GetSceneByBuildIndex(1);
+
         if (instance == null)
         {
 
@@ -55,27 +61,13 @@ public class GameManager : MonoBehaviour
 
         DontDestroyOnLoad(this);
 
+        if (GUIScene.isLoaded == false) {
 
-        healthBar = FindObjectOfType<HealthBar>();
-        gameOverText = FindObjectOfType<GameOver>();
+            SceneManager.LoadScene("GameUI", LoadSceneMode.Additive);
+
+        }
+
         background = FindObjectOfType<Background>();
-        currencyBar = FindObjectOfType<CurrencyBar>();
-
-
-        teddyButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Teddy").GetComponent<Button>();
-        slingButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Slinger").GetComponent<Button>();
-        cannonButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Pillow").GetComponent<Button>();
-        //speakerButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Speaker").GetComponent<Button>();
-
-
-        //teddyButton.onClick.AddListener(delegate { curTower.ChangeType(Tower.Type.TEDDY); });
-        //slingButton.onClick.AddListener(delegate { curTower.ChangeType(Tower.Type.SLING); });
-        //cannonButton.onClick.AddListener(delegate { curTower.ChangeType(Tower.Type.CANNON); });
-
-        teddyButton.onClick.AddListener(() => curTower.ChangeType(Tower.Type.TEDDY));
-        slingButton.onClick.AddListener(() => curTower.ChangeType(Tower.Type.SLING));
-        cannonButton.onClick.AddListener(() => curTower.ChangeType(Tower.Type.CANNON));
-       
 
 
         state = GameState.PLAYING;
@@ -92,25 +84,32 @@ public class GameManager : MonoBehaviour
     void Update()
     {
 
-        if (SceneManager.GetActiveScene().name == "Main")
-        {
 
-            if (Input.GetKeyDown(KeyCode.Escape))
-                SceneManager.LoadScene("MainMenu", LoadSceneMode.Additive);
+        if (healthBar == null || gameOverText == null ||  currencyBar == null || teddyButton == null || slingButton ==  null || cannonButton == null) {
+            
 
+            healthBar = FindObjectOfType<HealthBar>();
+            gameOverText = FindObjectOfType<GameOver>();
+            currencyBar = FindObjectOfType<CurrencyBar>();
+
+
+            teddyButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Teddy").GetComponent<Button>();
+            slingButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Slinger").GetComponent<Button>();
+            cannonButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Pillow").GetComponent<Button>();
+            //speakerButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Speaker").GetComponent<Button>();
 
         }
 
-        curTower = background.curSelected;
+        
 
 
-        if (curTower != null)
+        if (curTower != background.curSelected)
         {
 
-            teddyButton.onClick.AddListener(() => curTower.ChangeType(Tower.Type.TEDDY));
-            slingButton.onClick.AddListener(() => curTower.ChangeType(Tower.Type.SLING));
-            cannonButton.onClick.AddListener(() => curTower.ChangeType(Tower.Type.CANNON));
 
+            teddyButton.onClick.RemoveAllListeners();
+            slingButton.onClick.RemoveAllListeners();
+            cannonButton.onClick.RemoveAllListeners();
 
 
             foreach (Transform child in FindObjectOfType<Canvas>().transform.FindChild("ButtonManager"))
@@ -120,8 +119,12 @@ public class GameManager : MonoBehaviour
 
             }
 
-            //speakerButton.onClick.AddListener(delegate { curTower.ChangeType(Tower.Type.SPEAKER); });
+            curTower = background.curSelected;
 
+            teddyButton.onClick.AddListener(() => curTower.ChangeType(Tower.TowerType.TEDDY));
+            slingButton.onClick.AddListener(() => curTower.ChangeType(Tower.TowerType.SLING));
+            cannonButton.onClick.AddListener(() => curTower.ChangeType(Tower.TowerType.CANNON));
+            //speakerButton.onClick.AddListener(delegate { curTower.ChangeType(Tower.Type.SPEAKER); });
 
         }
 
@@ -177,19 +180,24 @@ public class GameManager : MonoBehaviour
     }
 
 
-    public bool Buy(int amount)
+    public bool CanBuy(int amount)
     {
 
         if (currencyBar.curCurrency - amount >= 0)
         {
 
-            currencyBar.curCurrency -= amount;
             return true;
         }
         else {
             return false;
         }
 
+
+    }
+
+    public void Buy(int amount) {
+
+        currencyBar.curCurrency -= amount; 
 
     }
 
@@ -216,12 +224,33 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public void SpeedUp()
+     public void SpeedUp()
     {
 
-        Time.timeScale = 2;
+		if (Time.timeScale == 2)
+		{
+			Time.timeScale = 1;
+		} else
+		{
+			Time.timeScale = 2;
+		}
 
     }
+
+	public void PlayPause()
+	{
+
+		if (state == GameState.PLAYING)
+		{
+			Pause ();
+			state = GameState.PAUSED;
+		} else
+		{
+			UnPause ();
+			state = GameState.PLAYING;
+		}
+
+	}
 
     public void DoDamage(int damage)
     {
