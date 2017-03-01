@@ -31,13 +31,8 @@ public class GameManager : MonoBehaviour
     public Button cannonButton;
     public Button speakerButton;
 
-
-
-
-    public Background background;
+	public Background background;
     public Tower curTower;
-
-
 
     // Use this for initialization
     void Start()
@@ -61,9 +56,22 @@ public class GameManager : MonoBehaviour
 
         DontDestroyOnLoad(this);
 
+<<<<<<< HEAD
         if (GUIScene.isLoaded == false) {
 
             SceneManager.LoadScene("GameUI", LoadSceneMode.Additive);
+=======
+        healthBar = FindObjectOfType<HealthBar>();
+        gameOverText = FindObjectOfType<GameOver>();
+        background = FindObjectOfType<Background>();
+        currencyBar = FindObjectOfType<CurrencyBar>();
+
+
+        teddyButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Teddy").GetComponent<Button>();
+        slingButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Slinger").GetComponent<Button>();
+        cannonButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Pillow").GetComponent<Button>();
+        //speakerButton = FindObjectOfType<Canvas>().transform.FindChild("ButtonManager").FindChild("Speaker").GetComponent<Button>();
+>>>>>>> JamesBranch
 
         }
 
@@ -224,8 +232,13 @@ public class GameManager : MonoBehaviour
 
     }
 
+<<<<<<< HEAD
      public void SpeedUp()
     {
+=======
+	public void SpeedUp()
+	{
+>>>>>>> JamesBranch
 
 		if (Time.timeScale == 2)
 		{
@@ -235,7 +248,7 @@ public class GameManager : MonoBehaviour
 			Time.timeScale = 2;
 		}
 
-    }
+	}
 
 	public void PlayPause()
 	{
@@ -265,5 +278,21 @@ public class GameManager : MonoBehaviour
         }
 
     }
+
+
+	public void PlayPause()
+	{
+
+		if (state == GameState.PLAYING)
+		{
+			Pause ();
+			state = GameState.PAUSED;
+		} else
+		{
+			UnPause ();
+			state = GameState.PLAYING;
+		}
+
+	}
 
 }
