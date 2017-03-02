@@ -11,6 +11,10 @@ public class Tower : MonoBehaviour
     public Level level;
     public Background background;
     public Clickable clicker;
+    public Selection selector;
+    public TierBadge badge;
+
+    public AudioClip upgrade;
 
     // Types of Towers and 
     public enum TowerType { BASE, TEDDY, SLING, CANNON, SPEAKER }
@@ -50,9 +54,9 @@ public class Tower : MonoBehaviour
     public Vector3 tier3;
 
     // Private leave.
-    private Tier m_Level1;
-    private Tier m_Level2;
-    private Tier m_Level3;
+    public Tier m_Level1;
+    public Tier m_Level2;
+    public Tier m_Level3;
 
 
     // Tower properties
@@ -87,7 +91,7 @@ public class Tower : MonoBehaviour
         m_towerRange = GetComponent<CircleCollider2D>();
         background = FindObjectOfType<Background>();
 
-		gameObject.GetComponent<SpriteRenderer> ().sortingOrder = (int)transform.position.y;
+        gameObject.GetComponent<SpriteRenderer>().sortingOrder = (int)transform.position.y;
 
 
         if (transform.Find("Clickable") != null)
@@ -98,10 +102,30 @@ public class Tower : MonoBehaviour
 
 
         }
+
+        if (transform.Find("Selector") != null)
+        {
+
+            selector = transform.FindChild("Selector").GetComponent<Selection>();
+            selector.parent = this;
+
+
+        }
+
+        if (transform.Find("TierBadge") != null)
+        {
+
+            badge = transform.FindChild("TierBadge").GetComponent<TierBadge>();
+            badge.parent = this;
+
+
+        }
+
+
         timer = 0.0f;
 
 
-		ChangeType(towerType);
+        ChangeType(towerType);
         //just for debug
     }
 
@@ -191,7 +215,7 @@ public class Tower : MonoBehaviour
 
         background.curSelected = this;
 
-        Debug.Log("I have been hit! :", gameObject);
+        //Debug.Log("I have been hit! :", gameObject);
 
 
     }
@@ -237,7 +261,7 @@ public class Tower : MonoBehaviour
                 target = m_enemyList.First();
 
             }
-            else  
+            else
             {
 
                 m_enemyList.Remove(m_enemyList.First());
@@ -246,8 +270,9 @@ public class Tower : MonoBehaviour
 
 
 
-            if (target.dead == true) {
-                m_enemyList.Remove(target); 
+            if (target.dead == true)
+            {
+                m_enemyList.Remove(target);
                 return;
             }
 
@@ -275,6 +300,7 @@ public class Tower : MonoBehaviour
             Projectile toInstanciate = towerWeapon;
             toInstanciate.transform.position = transform.position;
             toInstanciate.damage = towerTier.damage;
+            toInstanciate.GetComponent<CircleCollider2D>().radius = m_towerRange.radius / 2;
             // toInstanciate.target = m_enemyList.First ();
             Instantiate(toInstanciate);
 
@@ -288,49 +314,56 @@ public class Tower : MonoBehaviour
     public void ChangeType(TowerType newTowerType)
     {
 
-        if (newTowerType != TowerType.BASE) {
+        if (towerType != newTowerType)
+        {
 
-            if (!gameManager.CanBuy(cost[(int)newTowerType]))
-            { 
 
-                Debug.Log("Cant afford to buy tower"); 
-                return;
-
-            }
-
-            gameManager.Buy(cost[(int)newTowerType]);
-            towerType = newTowerType;
-
-            switch (towerType)
+            if (newTowerType != TowerType.BASE)
             {
-                case TowerType.BASE:
-                    gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[0];
-                    towerWeapon = towerWeapons[0];
-                    break;
-                case TowerType.SLING:
-                    gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[1];
-                    towerWeapon = towerWeapons[1];
-                    break;
-                case TowerType.CANNON:
-                    gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[2];
-                    towerWeapon = towerWeapons[2];
-                    break;
-                case TowerType.SPEAKER:
-                    gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[3];
-                    towerWeapon = towerWeapons[3];
-                    break;
-                case TowerType.TEDDY:
-                    gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[4];
-                    towerWeapon = towerWeapons[4];
-                    break;
+
+                if (!gameManager.CanBuy(cost[(int)newTowerType]))
+                {
+
+                    //Debug.Log("Cant afford to buy tower");
+                    return;
+
+                }
+
+                gameManager.Buy(cost[(int)newTowerType]);
+                towerType = newTowerType;
+
+                switch (towerType)
+                {
+                    case TowerType.BASE:
+                        gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[0];
+                        towerWeapon = towerWeapons[0];
+                        break;
+                    case TowerType.SLING:
+                        gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[1];
+                        towerWeapon = towerWeapons[1];
+                        break;
+                    case TowerType.CANNON:
+                        gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[2];
+                        towerWeapon = towerWeapons[2];
+                        break;
+                    case TowerType.SPEAKER:
+                        gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[3];
+                        towerWeapon = towerWeapons[3];
+                        break;
+                    case TowerType.TEDDY:
+                        gameObject.GetComponent<SpriteRenderer>().sprite = towerGraphics[4];
+                        towerWeapon = towerWeapons[4];
+                        break;
+
+                }
+
+                // setup the range
 
             }
 
-            // setup the range
-
+            m_towerRange.radius += towerTier.range;
         }
 
-            m_towerRange.radius = towerTier.range;
     }
 
 
@@ -352,21 +385,25 @@ public class Tower : MonoBehaviour
 
         if (towerTier.Equals(m_Level3) == false)
         {
-            
+
             if (towerTier.Equals(m_Level1) && gameManager.CanBuy(m_Level2.upgradeCost))
             {
+                //GetComponent<AudioSource>().PlayOneShot(upgrade);
                 towerTier = m_Level2;
                 gameManager.Buy(m_Level2.upgradeCost);
             }
             else if (towerTier.Equals(m_Level2) && gameManager.CanBuy(m_Level3.upgradeCost))
             {
+                //GetComponent<AudioSource>().PlayOneShot(upgrade);
                 towerTier = m_Level3;
-                gameManager.Buy(m_Level2.upgradeCost);
+                gameManager.Buy(m_Level3.upgradeCost);
             }
 
         }
 
-        Debug.Log("Tower Upgraded");
+
+        //Debug.Log("Tower Upgraded");
+
 
     }
 

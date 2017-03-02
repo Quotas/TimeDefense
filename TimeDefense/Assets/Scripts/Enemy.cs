@@ -7,7 +7,7 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
 
-    public Level level;
+    //public Level level;
     public GameManager gameManager;
     public enum EnemyType { BIG, SMALL, FAST };
     public EnemyType type;
@@ -19,10 +19,11 @@ public class Enemy : MonoBehaviour
     public int damage = 1;
     public float speed = 10f;
 
-	public float deathTimer;
+    public float deathTimer;
     public int coins;
     public bool dead;
-	public float timer;
+    public float timer;
+    public float scaleSize = 1;
 
     #region EnemySprites
     public Sprite bigSprite;
@@ -35,11 +36,13 @@ public class Enemy : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-		
-		timer = 0.0f;
+
+        timer = 0.0f;
 
         gameManager = FindObjectOfType<GameManager>();
-        nodes = FindObjectsOfType<Node>().OrderBy(node => node.order).ToList<Node>();
+
+
+        nodes = new List<Node>(gameManager.nodes);
 
         //switch (type)
         //{
@@ -64,7 +67,8 @@ public class Enemy : MonoBehaviour
     void Update()
     {
 
-		if (health <= 0) {
+        if (health <= 0)
+        {
 
             if (dead == false)
                 StartCoroutine(onDeath());
@@ -72,12 +76,23 @@ public class Enemy : MonoBehaviour
 
             dead = true;
 
-           
 
-		} else {
-			transform.position = Vector3.MoveTowards (transform.position, nodes.First ().transform.position, speed * Time.deltaTime);
-			
-		}
+
+        }
+        else
+        {
+
+
+            transform.position = Vector3.MoveTowards(new Vector3(transform.position.x, transform.position.y, 0), nodes.First().transform.position, speed * Time.deltaTime);
+
+            transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.y);
+
+            float size = Mathf.Clamp(transform.position.y / scaleSize, -0.5f, 0.5f);
+
+            transform.localScale = Vector3.one - new Vector3(size, size, size);
+
+
+        }
 
 
 
@@ -90,11 +105,13 @@ public class Enemy : MonoBehaviour
 
     }
 
-    IEnumerator onDeath() {
+    IEnumerator onDeath()
+    {
 
-        gameManager.AddCoins(coins); 
+        gameManager.AddCoins(coins);
 
         gameObject.GetComponent<Animator>().SetBool("death", true);
+
 
         transform.position = new Vector3(transform.position.x, transform.position.y, 10);
 

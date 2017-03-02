@@ -84,7 +84,7 @@ public class Level : MonoBehaviour
         foreach (Enemy enemy in waveID[curWave])
         {
             xOffset += 2;
-            enemy.level = this;
+            //enemy.level = this;
             enemy.transform.position = GameObject.FindGameObjectWithTag("SpawnPoint").transform.position;
             enemy.transform.position += new Vector3(xOffset, 0, 0);
             Instantiate(enemy);

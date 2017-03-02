@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -32,8 +33,10 @@ public class GameManager : MonoBehaviour
     public Button speakerButton;
     public Button upgradeButton;
 
-	public Background background;
+    public Background background;
     public Tower curTower;
+
+    public List<Node> nodes;
 
     // Use this for initialization
     void Start()
@@ -41,20 +44,33 @@ public class GameManager : MonoBehaviour
 
         levelScene = SceneManager.GetSceneByBuildIndex(0);
 
-        if (instance == null)
-        {
+        //if (instance == null)
+        //{
 
-            instance = this;
+        //    instance = this;
+
+        //}
+
+        //if (instance != this)
+        //{
+        //    Destroy(gameObject);
+
+        //}
+
+        //DontDestroyOnLoad(this);
+
+
+        nodes = FindObjectsOfType<Node>().OrderBy(node => node.order).ToList<Node>();
+        int i = 0;
+        GetComponent<LineRenderer>().numPositions = nodes.Count;
+
+        foreach (Node node in nodes)
+        {
+            GetComponent<LineRenderer>().SetPosition(i, node.transform.position);
+            i++;
 
         }
 
-        if (instance != this)
-        {
-            Destroy(gameObject);
-
-        }
-
-        DontDestroyOnLoad(this);
 
 
         healthBar = FindObjectOfType<HealthBar>();
@@ -85,7 +101,7 @@ public class GameManager : MonoBehaviour
     void Update()
     {
 
-       
+
 
 
         if (curTower != background.curSelected)
@@ -95,6 +111,7 @@ public class GameManager : MonoBehaviour
             teddyButton.onClick.RemoveAllListeners();
             slingButton.onClick.RemoveAllListeners();
             cannonButton.onClick.RemoveAllListeners();
+            upgradeButton.onClick.RemoveAllListeners();
 
 
             foreach (Transform child in FindObjectOfType<Canvas>().transform.FindChild("ButtonManager"))
@@ -131,17 +148,25 @@ public class GameManager : MonoBehaviour
         }
 
 
-        if (Input.GetMouseButtonDown(0))
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //	RaycastHit hit;
+        //	Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //	//var select = GameObject.FindWithTag("select").transform;
+        //	if (Physics.Raycast(ray, out hit))
+        //	{
+
+        //		//Debug.Log(hit.transform.tag);
+
+        //	}
+        //}
+
+        if (Input.GetMouseButton(0) && (state == GameState.GAMEOVER || state == GameState.WIN))
         {
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            //var select = GameObject.FindWithTag("select").transform;
-            if (Physics.Raycast(ray, out hit))
-            {
 
-                Debug.Log(hit.transform.tag);
 
-            }
+            SceneManager.LoadScene("MainMenu");
+
         }
 
 
@@ -153,7 +178,7 @@ public class GameManager : MonoBehaviour
             case GameState.PLAYING:
                 break;
             case GameState.WIN:
-                gameOverText.GetComponent<Image>().sprite = gameOverText.win; 
+                gameOverText.GetComponent<Image>().sprite = gameOverText.win;
                 gameOverText.GetComponent<Image>().enabled = true;
                 Time.timeScale = 0;
                 break;
@@ -177,16 +202,18 @@ public class GameManager : MonoBehaviour
 
             return true;
         }
-        else {
+        else
+        {
             return false;
         }
 
 
     }
 
-    public void Buy(int amount) {
+    public void Buy(int amount)
+    {
 
-        currencyBar.curCurrency -= amount; 
+        currencyBar.curCurrency -= amount;
 
     }
 
@@ -214,34 +241,36 @@ public class GameManager : MonoBehaviour
     }
 
 
-     public void SpeedUp()
+    public void SpeedUp()
     {
 
 
-		if (Time.timeScale == 2)
-		{
-			Time.timeScale = 1;
-		} else
-		{
-			Time.timeScale = 2;
-		}
+        if (Time.timeScale == 2)
+        {
+            Time.timeScale = 1;
+        }
+        else
+        {
+            Time.timeScale = 2;
+        }
 
-	}
+    }
 
-	public void PlayPause()
-	{
+    public void PlayPause()
+    {
 
-		if (state == GameState.PLAYING)
-		{
-			Pause ();
-			state = GameState.PAUSED;
-		} else
-		{
-			UnPause ();
-			state = GameState.PLAYING;
-		}
+        if (state == GameState.PLAYING)
+        {
+            Pause();
+            state = GameState.PAUSED;
+        }
+        else
+        {
+            UnPause();
+            state = GameState.PLAYING;
+        }
 
-	}
+    }
 
     public void DoDamage(int damage)
     {
