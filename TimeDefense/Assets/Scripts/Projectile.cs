@@ -34,7 +34,7 @@ public class Projectile : MonoBehaviour
         if (aoeAttack == false)
         {
 
-            if (target == null)
+            if (target == null || target.dead == true)
             {
 
                 Destroy(this.gameObject);
